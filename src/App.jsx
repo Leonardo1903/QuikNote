@@ -1,14 +1,41 @@
 import "./App.css";
-import Home from "./pages/Home";
+import { DashBoard, Home, Login, SignUp } from "./pages";
+import { PrivateRoutes } from "./components";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { AuthProvider } from "./context/authContext";
+import { Toaster } from "./components/ui/toaster";
 
-import { Routes, Route } from "react-router-dom";
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <SignUp />,
+  },
+  {
+    element: <PrivateRoutes />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <DashBoard />,
+      },
+    ],
+  },
+]);
 
 function App() {
   return (
     <>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </AuthProvider>
     </>
   );
 }

@@ -10,7 +10,7 @@ export default function Hero() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentWord((prev) => (prev + 1) % words.length);
-    }, 2000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [words.length]);
   return (
@@ -42,7 +42,7 @@ export default function Hero() {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-purple-600 text-purple-400 hover:bg-purple-600/10"
+                className="border-purple-600 text-purple-400 "
                 asChild
               >
                 <Link href="#features">Learn More</Link>
