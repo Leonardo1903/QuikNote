@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="w-full py-6 px-4 md:px-6 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
         <p className="text-sm text-gray-400">
-          © 2024 Quiknote. All rights reserved.
+          © 2024 QuikNote. All rights reserved.
         </p>
         <nav className="flex gap-4 sm:gap-6">
           <Link
