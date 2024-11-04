@@ -13,27 +13,37 @@ import {
 } from "../components/ui/card";
 import { Label } from "../components/ui/label";
 import { Separator } from "../components/ui/separator";
+import { useToast } from "../hooks/use-toast";
 import { Lock, Mail } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const { loginUser } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
 
     try {
       const userInfo = { email, password };
       loginUser(userInfo);
+      toast({
+        title: "Success",
+        description: "Logged in successfully",
+        variant: "default",
+      });
       setEmail("");
       setPassword("");
       navigate("/dashboard");
     } catch (error) {
-      setError(error.message);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -50,7 +60,7 @@ export default function Login() {
           <Separator className="bg-gray-700" />
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-gray-200">
                 Email
@@ -96,6 +106,11 @@ export default function Login() {
               Log In
             </Button>
           </form>
+          <div className="mt-4 flex items-center justify-between">
+            <Separator className="w-1/3 bg-gray-700" />
+            <span className="text-sm text-gray-400">or</span>
+            <Separator className="w-1/3 bg-gray-700" />
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <p className="text-sm text-gray-400">

@@ -23,29 +23,42 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const toast = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate;
 
   const { registerUser } = useAuth();
 
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
       if (password !== confirmPassword) {
-        toast.error("Passwords do not match");
+        toast({
+          title: "Error",
+          description: "Passwords do not match",
+          variant: "destructive",
+        });
         return;
       }
 
       const userInfo = { name, email, password };
       registerUser(userInfo);
+      toast({
+        title: "Success",
+        description: "Account created successfully",
+        variant: "default",
+      });
       setName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
       navigate("/dashboard");
     } catch (error) {
-      console.error(error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -70,7 +83,7 @@ export default function SignUp() {
           <Separator className="bg-gray-700" />
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-gray-200">
                 Full Name
