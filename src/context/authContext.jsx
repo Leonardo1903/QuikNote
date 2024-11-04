@@ -67,7 +67,6 @@ export const AuthProvider = ({ children }) => {
   const checkAuthStatus = async () => {
     setLoading(true);
     try {
-      // Attempt to get the current session
       const session = await account.getSession("current");
       if (session) {
         const accountDetails = await account.get();
