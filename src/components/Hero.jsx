@@ -34,18 +34,10 @@ export default function Hero() {
                 className="bg-purple-600 hover:bg-purple-700 text-white"
                 asChild
               >
-                <Link href="#cta">
+                <Link to="/signup">
                   Get Started
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-purple-600 text-purple-400 "
-                asChild
-              >
-                <Link href="#features">Learn More</Link>
               </Button>
             </div>
           </div>

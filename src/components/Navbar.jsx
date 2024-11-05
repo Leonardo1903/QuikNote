@@ -22,21 +22,21 @@ export default function Navbar() {
         </span>
       </Link>
       <nav className="ml-auto hidden md:flex gap-4 sm:gap-6">
-        <Link
+        <a
           className="text-sm font-medium hover:text-purple-400 transition-colors"
-          to="#features"
+          href="#features"
         >
           Features
-        </Link>
-        <Link
+        </a>
+        <a
           className="text-sm font-medium hover:text-purple-400 transition-colors"
-          to="#benefits"
+          href="#benefits"
         >
           Benefits
-        </Link>
+        </a>
         <Link
           className="text-sm font-medium hover:text-purple-400 transition-colors"
-          to="#cta"
+          to="/signup"
         >
           Get Started
         </Link>
