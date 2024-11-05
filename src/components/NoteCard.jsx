@@ -19,6 +19,19 @@ import {
 } from "../components/ui/dialog";
 import { Trash2, Pen } from "lucide-react";
 
+const getLuminance = (color) => {
+  const rgb = color.match(/\w\w/g).map((c) => parseInt(c, 16));
+  const [r, g, b] = rgb.map((c) => {
+    c /= 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+
+const isLightColor = (color) => {
+  return getLuminance(color) > 0.5;
+};
+
 export default function NoteCard({ note, onDelete, onBringToFront, onUpdate }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: note.$id,
@@ -51,6 +64,8 @@ export default function NoteCard({ note, onDelete, onBringToFront, onUpdate }) {
     setIsDialogOpen(false);
   };
 
+  const textColor = isLightColor(localColor) ? "text-black" : "text-white";
+
   return (
     <>
       <Card
@@ -67,43 +82,47 @@ export default function NoteCard({ note, onDelete, onBringToFront, onUpdate }) {
           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
           minWidth: "256px",
           maxWidth: "400px",
+          minHeight: "200px",
+          maxHeight: "400px",
         }}
-        className="cursor-move"
+        className={`cursor-move ${textColor}`}
         onClick={() => onBringToFront(note.$id)}
         {...attributes}
         {...listeners}
       >
-        <CardHeader className="p-4 border-b border-gray-700">
-          <CardTitle className="text-white font-semibold text-lg tracking-wide flex justify-between">
+        <CardHeader className="p-4 border-b border-gray-700 flex justify-between items-start relative">
+          <CardTitle
+            className={`font-semibold text-lg tracking-wide ${textColor}`}
+          >
             {note.Title}
-            <div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsDialogOpen(true);
-                }}
-                className="text-gray-300 hover:text-white hover:bg-gray-800 p-1 rounded-full"
-              >
-                <Pen className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(note.$id);
-                }}
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-800 p-1 rounded-full"
-              >
-                <Trash2 className="h-5 w-5" />
-              </Button>
-            </div>
           </CardTitle>
+          <div className="absolute top-2 right-2 flex space-x-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDialogOpen(true);
+              }}
+              className={`hover:bg-gray-800 p-1 rounded-full ${textColor} hover:text-white`}
+            >
+              <Pen className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(note.$id);
+              }}
+              className={`hover:bg-gray-800 p-1 rounded-full ${textColor} hover:text-red-500`}
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-4 max-h-64 overflow-auto">
-          <p className="text-gray-300 text-sm whitespace-pre-wrap">
+          <p className={`text-sm whitespace-pre-wrap ${textColor}`}>
             {note.Content}
           </p>
         </CardContent>
@@ -135,7 +154,7 @@ export default function NoteCard({ note, onDelete, onBringToFront, onUpdate }) {
                 id="content"
                 value={localContent}
                 onChange={(e) => setLocalContent(e.target.value)}
-                className="bg-gray-700 border-gray-600 text-gray-100 resize-vertical"
+                className="bg-gray-700 border-gray-600 text-gray-100 resize-vertical overflow-hidden"
                 rows={4}
                 ref={contentRef}
               />

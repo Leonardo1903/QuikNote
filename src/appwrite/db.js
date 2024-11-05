@@ -33,7 +33,6 @@ export const dbService = {
 
   updateNote: async (noteId, note) => {
     try {
-      console.log("noteId in dbService.updateNote:", noteId);
       const response = await database.updateDocument(
         DATABASE_ID,
         COLLECTION_ID,

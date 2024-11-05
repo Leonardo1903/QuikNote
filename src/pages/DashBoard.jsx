@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   DndContext,
   useSensor,
@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [maxZIndex, setMaxZIndex] = useState(0);
   const [activeId, setActiveId] = useState(null);
+  const notesContainerRef = useRef(null);
 
   const { logoutUser, user } = useAuth();
   const { toast } = useToast();
@@ -166,13 +167,20 @@ export default function Dashboard() {
 
   const handleDragEnd = async (e) => {
     const { active, delta } = e;
+    const containerRect = notesContainerRef.current.getBoundingClientRect();
     try {
       const updatedNotes = notes.map((note) => {
         if (note.$id === active.id) {
           const currentPosition = JSON.parse(note.Position);
           const newPosition = {
-            x: currentPosition.x + delta.x,
-            y: currentPosition.y + delta.y,
+            x: Math.min(
+              Math.max(currentPosition.x + delta.x, 0),
+              containerRect.width - 256 // Assuming minimum note width is 256px
+            ),
+            y: Math.min(
+              Math.max(currentPosition.y + delta.y, 0),
+              containerRect.height - 200 // Assuming minimum note height is 200px
+            ),
           };
           dbService.updateNote(note.$id, {
             Position: JSON.stringify(newPosition),
@@ -195,7 +203,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-800 p-8">
-      <div className="mx-auto bg-gray-900/60 backdrop-blur-md border border-gray-700 rounded-lg p-6">
+      <div className="mx-auto bg-white/10 backdrop-blur-md border border-gray-700 rounded-lg p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl font-extrabold text-purple-400">
             Welcome, {user.name}
@@ -210,7 +218,7 @@ export default function Dashboard() {
         <Separator className="bg-gray-600 mb-6" />
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="mb-4  py-2 bg-gray-700 border-2 border-dashed border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800/80 transition-all duration-300">
+            <Button className="mb-4 py-2 bg-gray-700 border-2 border-dashed border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800/80 transition-all duration-300">
               <Plus className="mr-2" /> Create New Note
             </Button>
           </DialogTrigger>
@@ -271,12 +279,16 @@ export default function Dashboard() {
             </div>
           </DialogContent>
         </Dialog>
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
+        <div
+          ref={notesContainerRef}
+          className="relative bg-gray-800/50 rounded-lg p-4 "
+          style={{ height: "calc(100vh - 100px)" }}
         >
-          <div className="relative" style={{ height: "calc(100vh - 200px)" }}>
+          <DndContext
+            sensors={sensors}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
             {notes.map((note) => (
               <NoteCard
                 key={note.$id}
@@ -286,8 +298,8 @@ export default function Dashboard() {
                 onUpdate={handleUpdateNote}
               />
             ))}
-          </div>
-        </DndContext>
+          </DndContext>
+        </div>
       </div>
     </div>
   );
