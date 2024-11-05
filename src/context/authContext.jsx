@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { account } from "../lib/config";
-import { ID } from "appwrite";
+import { authService } from "../appwrite/auth";
 
 const AuthContext = createContext();
 
@@ -17,11 +16,10 @@ export const AuthProvider = ({ children }) => {
   const loginUser = async (userInfo) => {
     setLoading(true);
     try {
-      await account.createEmailPasswordSession(
+      const accountDetails = await authService.loginUser(
         userInfo.email,
         userInfo.password
       );
-      const accountDetails = await account.get();
       setUser(accountDetails);
     } catch (error) {
       console.error(error);
@@ -33,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   const logoutUser = async () => {
     setLoading(true);
     try {
-      await account.deleteSession("current");
+      await authService.logoutUser();
       setUser(null);
     } catch (error) {
       console.error(error);
@@ -45,17 +43,11 @@ export const AuthProvider = ({ children }) => {
   const registerUser = async (userInfo) => {
     setLoading(true);
     try {
-      await account.create(
-        ID.unique(),
+      const accountDetails = await authService.registerUser(
         userInfo.email,
         userInfo.password,
         userInfo.name
       );
-      await account.createEmailPasswordSession(
-        userInfo.email,
-        userInfo.password
-      );
-      const accountDetails = await account.get();
       setUser(accountDetails);
     } catch (error) {
       console.error(error);
@@ -67,11 +59,8 @@ export const AuthProvider = ({ children }) => {
   const checkAuthStatus = async () => {
     setLoading(true);
     try {
-      const session = await account.getSession("current");
-      if (session) {
-        const accountDetails = await account.get();
-        setUser(accountDetails);
-      }
+      const accountDetails = await authService.checkAuthStatus();
+      setUser(accountDetails);
     } catch (error) {
       console.error("User is not authenticated", error);
       setUser(null);
