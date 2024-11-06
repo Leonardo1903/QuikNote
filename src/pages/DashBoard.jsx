@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useRef } from "react";
 import {
   DndContext,
@@ -83,8 +85,8 @@ export default function Dashboard() {
           ...newNote,
           UserID: user.$id,
           Position: JSON.stringify({
-            x: Math.random() * 300,
-            y: Math.random() * 300,
+            x: Math.random() * 100,
+            y: Math.random() * 100,
           }),
           ZIndex: newZIndex,
         });
@@ -174,12 +176,18 @@ export default function Dashboard() {
           const currentPosition = JSON.parse(note.Position);
           const newPosition = {
             x: Math.min(
-              Math.max(currentPosition.x + delta.x, 0),
-              containerRect.width - 256 // Assuming minimum note width is 256px
+              Math.max(
+                ((currentPosition.x + delta.x) / containerRect.width) * 100,
+                0
+              ),
+              100
             ),
             y: Math.min(
-              Math.max(currentPosition.y + delta.y, 0),
-              containerRect.height - 200 // Assuming minimum note height is 200px
+              Math.max(
+                ((currentPosition.y + delta.y) / containerRect.height) * 100,
+                0
+              ),
+              100
             ),
           };
           dbService.updateNote(note.$id, {
@@ -202,10 +210,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-800 p-8">
-      <div className="mx-auto bg-white/10 backdrop-blur-md border border-gray-700 rounded-lg p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-4xl font-extrabold text-purple-400">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-800 p-4 sm:p-6 md:p-8">
+      <div className="mx-auto bg-white/10 backdrop-blur-md border border-gray-700 rounded-lg p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-purple-400">
             Welcome, {user.name}
           </h1>
           <Button
@@ -218,7 +226,7 @@ export default function Dashboard() {
         <Separator className="bg-gray-600 mb-6" />
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="mb-4 py-2 bg-gray-700 border-2 border-dashed border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800/80 transition-all duration-300">
+            <Button className="mb-4 py-2 bg-gray-700 border-2 border-dashed border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800/80 transition-all duration-300 w-full sm:w-auto">
               <Plus className="mr-2" /> Create New Note
             </Button>
           </DialogTrigger>
@@ -281,8 +289,8 @@ export default function Dashboard() {
         </Dialog>
         <div
           ref={notesContainerRef}
-          className="relative bg-gray-800/50 rounded-lg p-4 "
-          style={{ height: "calc(100vh - 100px)" }}
+          className="relative bg-gray-800/50 rounded-lg p-4 overflow-hidden"
+          style={{ height: "calc(100vh - 200px)" }}
         >
           <DndContext
             sensors={sensors}
@@ -296,6 +304,7 @@ export default function Dashboard() {
                 onDelete={handleDeleteNote}
                 onBringToFront={handleBringToFront}
                 onUpdate={handleUpdateNote}
+                containerRef={notesContainerRef}
               />
             ))}
           </DndContext>
