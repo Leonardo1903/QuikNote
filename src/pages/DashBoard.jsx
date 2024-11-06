@@ -212,7 +212,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-purple-800 p-4 sm:p-6 md:p-8">
       <div className="mx-auto bg-white/10 backdrop-blur-md border border-gray-700 rounded-lg p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
+        <div className="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-purple-400">
             Welcome, {user.name}
           </h1>
