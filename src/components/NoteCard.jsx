@@ -32,7 +32,13 @@ const isLightColor = (color) => {
   return getLuminance(color) > 0.5;
 };
 
-export default function NoteCard({ note, onDelete, onBringToFront, onUpdate }) {
+export default function NoteCard({
+  note,
+  onDelete,
+  onBringToFront,
+  onUpdate,
+  containerRef,
+}) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: note.$id,
   });
@@ -104,7 +110,7 @@ export default function NoteCard({ note, onDelete, onBringToFront, onUpdate }) {
                 e.stopPropagation();
                 setIsDialogOpen(true);
               }}
-              className={`hover:bg-gray-800 p-1 rounded-full ${textColor} hover:text-white`}
+              className={`hover:bg-gray-800 hover:text-white p-1 rounded-full ${textColor}`}
             >
               <Pen className="h-5 w-5" />
             </Button>
@@ -115,7 +121,7 @@ export default function NoteCard({ note, onDelete, onBringToFront, onUpdate }) {
                 e.stopPropagation();
                 onDelete(note.$id);
               }}
-              className={`hover:bg-gray-800 p-1 rounded-full ${textColor} hover:text-red-500`}
+              className={`hover:bg-gray-800 hover:text-red-500 p-1 rounded-full ${textColor}`}
             >
               <Trash2 className="h-5 w-5" />
             </Button>
