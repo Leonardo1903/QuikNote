@@ -1,8 +1,76 @@
-# React + Vite
+# QuikNote
+A Full-Stack Sticky Notes Application
+## Features
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- Secure User Authentication
+- Personalised Dashboard
+- CRUD Operations performed by User
+- Drag and Drop of Sticky Notes
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Client:** React, TailwindCSS, ShadCN-UI
+
+**Server:** Appwrite
+
+
+## Lessons Learned
+- Setup and Usage of Appwrite for Auth and Storage
+- Usage of dnd-kit for drag and drop features
+
+
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/Leonardo1903/QuikNote
+```
+
+Go to the project directory
+
+```bash
+  cd QuikNote
+```
+
+Install dependencies
+
+```bash
+  npm install
+```
+
+Start the server
+
+```bash
+  npm run dev
+```
+
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`VITE_APPWRITE_URL` = "Appwrite URL"
+
+`VITE_APPWRITE_PROJECT_ID` = "Your Project ID"
+
+`VITE_APPWRITE_DATABASE_ID` = "Your DataBase ID"
+
+`VITE_APPWRITE_COLLECTION_ID` = "Your Collection ID"
+
+## Screenshots
+Landing page:
+![Landing page](https://github.com/user-attachments/assets/b5998adf-db9f-4761-a9b5-7563bcab01c7)
+DashBoard:
+![DashBoard](https://github.com/user-attachments/assets/ff9a352f-52cd-4aae-a303-a8d59eaf4db1)
+
+
+## Demo
+
+https://quik-note.vercel.app/
+
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
