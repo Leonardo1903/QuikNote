@@ -14,7 +14,7 @@ A Full-Stack Sticky Notes Application
 **Server:** Appwrite
 
 
-## Lessons Learned
+## Key Learnings
 - Setup and Usage of Appwrite for Auth and Storage
 - Usage of dnd-kit for drag and drop features
 
