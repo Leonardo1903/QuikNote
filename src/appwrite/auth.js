@@ -28,12 +28,6 @@ export const authService = {
 
   registerUser: async (email, password, name) => {
     try {
-      // Safely check for and delete an active session
-      const session = await account.getSession("current");
-      if (session) {
-        await account.deleteSession("current");
-      }
-
       // Register the user
       await account.create(ID.unique(), email, password, name);
 
