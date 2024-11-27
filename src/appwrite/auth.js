@@ -29,15 +29,9 @@ export const authService = {
   registerUser: async (email, password, name) => {
     try {
       // Safely check for and delete an active session
-      try {
-        const session = await account.getSession("current");
-        if (session) {
-          await account.deleteSession("current");
-        }
-      } catch (error) {
-        console.log(
-          "No active session found (guest user). Proceeding with registration."
-        );
+      const session = await account.getSession("current");
+      if (session) {
+        await account.deleteSession("current");
       }
 
       // Register the user

@@ -24,7 +24,7 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate;
+  const navigate = useNavigate();
 
   const { registerUser } = useAuth();
 
