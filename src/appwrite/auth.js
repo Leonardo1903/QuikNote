@@ -28,6 +28,14 @@ export const authService = {
 
   registerUser: async (email, password, name) => {
     try {
+
+      // Check if a session is active
+      const session = await account.getSession("current");
+      if (session) {
+        // Log out the current user
+        await account.deleteSession("current");
+      }
+
       // Register user
       await account.create(ID.unique(), email, password, name);
       // Automatically log the user in after registration

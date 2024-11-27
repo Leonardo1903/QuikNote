@@ -47,8 +47,10 @@ export default function Dashboard() {
   );
 
   useEffect(() => {
-    fetchNotes();
-  }, []);
+    if (user) {
+      fetchNotes();
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logoutUser();

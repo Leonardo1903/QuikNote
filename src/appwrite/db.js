@@ -1,4 +1,4 @@
-import { ID } from "appwrite";
+import { ID, Query } from "appwrite";
 import { database, DATABASE_ID, COLLECTION_ID } from "../lib/config";
 
 export const dbService = {
@@ -17,12 +17,12 @@ export const dbService = {
     }
   },
 
-  getNotes: async () => {
+  getNotes: async (userId) => {
     try {
       const response = await database.listDocuments(
         DATABASE_ID,
         COLLECTION_ID,
-        []
+        [Query.equal("UserID", userId)]
       );
       return response.documents;
     } catch (error) {
