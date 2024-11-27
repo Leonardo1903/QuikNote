@@ -22,8 +22,10 @@ import { useAuth } from "../context/authContext";
 import { useToast } from "../hooks/use-toast";
 import { dbService } from "../appwrite/db";
 import NoteCard from "../components/NoteCard";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState({
     Title: "",
@@ -59,6 +61,7 @@ export default function Dashboard() {
       description: "Logged out successfully",
       variant: "default",
     });
+    navigate("/");
   };
 
   const fetchNotes = async () => {
