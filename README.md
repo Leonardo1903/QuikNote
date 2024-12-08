@@ -16,7 +16,7 @@ A Full-Stack Sticky Notes Application
 
 ## Key Learnings
 - Setup and Usage of Appwrite for Auth and Storage
-- Usage of dnd-kit for drag and drop features
+- Usage of Framer Motion for drag and drop features
 
 
 ## Run Locally

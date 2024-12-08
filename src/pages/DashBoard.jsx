@@ -1,10 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  DndContext,
-  useSensor,
-  useSensors,
-  PointerSensor,
-} from "@dnd-kit/core";
 import { Plus } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -34,19 +28,10 @@ export default function Dashboard() {
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [maxZIndex, setMaxZIndex] = useState(0);
-  const [activeId, setActiveId] = useState(null);
   const notesContainerRef = useRef(null);
 
   const { logoutUser, user } = useAuth();
   const { toast } = useToast();
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
 
   useEffect(() => {
     if (user) {
@@ -107,18 +92,20 @@ export default function Dashboard() {
     }
   };
 
-  const handleUpdateNote = async (id, title, content, color) => {
+  const handleUpdateNote = async (id, title, content, color, position) => {
     try {
-      await dbService.updateNote(id, {
+      const updatedNote = {
         Title: title,
         Content: content,
         Color: color,
-      });
+      };
+      if (position) {
+        updatedNote.Position = position;
+      }
+      await dbService.updateNote(id, updatedNote);
       setNotes(
         notes.map((note) =>
-          note.$id === id
-            ? { ...note, Title: title, Content: content, Color: color }
-            : note
+          note.$id === id ? { ...note, ...updatedNote } : note
         )
       );
     } catch (error) {
@@ -163,47 +150,6 @@ export default function Dashboard() {
         variant: "destructive",
       });
     }
-  };
-
-  const handleDragStart = (e) => {
-    const { active } = e;
-    setActiveId(active.id);
-  };
-
-  const handleDragEnd = async (e) => {
-    const { active, delta } = e;
-    const containerRect = notesContainerRef.current.getBoundingClientRect();
-    try {
-      const updatedNotes = notes.map((note) => {
-        if (note.$id === active.id) {
-          const currentPosition = JSON.parse(note.Position);
-          const newPosition = {
-            x: Math.min(
-              Math.max(currentPosition.x + delta.x, 0),
-              containerRect.width - 256
-            ),
-            y: Math.min(
-              Math.max(currentPosition.y + delta.y, 0),
-              containerRect.height - 200
-            ),
-          };
-          dbService.updateNote(note.$id, {
-            Position: JSON.stringify(newPosition),
-          });
-          return { ...note, Position: JSON.stringify(newPosition) };
-        }
-        return note;
-      });
-      setNotes(updatedNotes);
-    } catch (error) {
-      console.error("Error updating note position:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update note position",
-        variant: "destructive",
-      });
-    }
-    setActiveId(null);
   };
 
   return (
@@ -289,22 +235,16 @@ export default function Dashboard() {
           className="relative bg-gray-800/50 rounded-lg p-4 overflow-hidden"
           style={{ height: "calc(100vh - 200px)" }}
         >
-          <DndContext
-            sensors={sensors}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            {notes.map((note) => (
-              <NoteCard
-                key={note.$id}
-                note={note}
-                onDelete={handleDeleteNote}
-                onBringToFront={handleBringToFront}
-                onUpdate={handleUpdateNote}
-                containerRef={notesContainerRef}
-              />
-            ))}
-          </DndContext>
+          {notes.map((note) => (
+            <NoteCard
+              key={note.$id}
+              note={note}
+              onDelete={handleDeleteNote}
+              onBringToFront={handleBringToFront}
+              onUpdate={handleUpdateNote}
+              containerRef={notesContainerRef}
+            />
+          ))}
         </div>
       </div>
     </div>

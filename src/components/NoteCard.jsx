@@ -1,22 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { useDraggable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Textarea } from "../components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../components/ui/dialog";
+import { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Trash2, Pen } from "lucide-react";
 
 const getLuminance = (color) => {
@@ -39,21 +28,12 @@ export default function NoteCard({
   onUpdate,
   containerRef,
 }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: note.$id,
-  });
   const [isEditing, setIsEditing] = useState(false);
   const [localTitle, setLocalTitle] = useState(note.Title);
   const [localContent, setLocalContent] = useState(note.Content);
   const [localColor, setLocalColor] = useState(note.Color);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const contentRef = useRef(null);
-
-  const style = transform
-    ? {
-        transform: CSS.Translate.toString(transform),
-      }
-    : undefined;
 
   const position = JSON.parse(note.Position);
 
@@ -74,65 +54,83 @@ export default function NoteCard({
 
   return (
     <>
-      <Card
-        ref={setNodeRef}
-        style={{
-          ...style,
-          position: "absolute",
-          left: position.x,
-          top: position.y,
-          zIndex: note.ZIndex,
-          backgroundColor: localColor,
-          borderRadius: "12px",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-          minWidth: "256px",
-          maxWidth: "400px",
-          minHeight: "200px",
-          maxHeight: "400px",
+      <motion.div
+        drag
+        dragConstraints={containerRef}
+        dragElastic={0.1}
+        dragMomentum={false}
+        onDragEnd={(event, info) => {
+          const newPosition = {
+            x: position.x + info.offset.x,
+            y: position.y + info.offset.y,
+          };
+          onUpdate(
+            note.$id,
+            note.Title,
+            note.Content,
+            note.Color,
+            JSON.stringify(newPosition)
+          );
         }}
-        className={`cursor-move ${textColor}`}
+        initial={{ x: position.x, y: position.y }}
+        style={{
+          position: "absolute",
+          zIndex: note.ZIndex,
+        }}
+        whileDrag={{ scale: 1.05, zIndex: 9999 }}
         onClick={() => onBringToFront(note.$id)}
-        {...attributes}
-        {...listeners}
       >
-        <CardHeader className="p-4 border-b border-gray-700 flex justify-between items-start relative">
-          <CardTitle
-            className={`font-semibold text-lg tracking-wide ${textColor}`}
-          >
-            {note.Title}
-          </CardTitle>
-          <div className="absolute top-2 right-2 flex space-x-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsDialogOpen(true);
-              }}
-              className={`hover:bg-gray-800 hover:text-white p-1 rounded-full ${textColor}`}
+        <Card
+          style={{
+            backgroundColor: localColor,
+            borderRadius: "12px",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            minWidth: "256px",
+            maxWidth: "400px",
+            minHeight: "200px",
+            maxHeight: "400px",
+          }}
+          className={`cursor-move ${textColor}`}
+        >
+          <CardHeader className="p-4 border-b border-gray-700 flex justify-between items-start relative">
+            <CardTitle
+              className={`font-semibold text-lg tracking-wide ${textColor}`}
             >
-              <Pen className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(note.$id);
-              }}
-              className={`hover:bg-gray-800 hover:text-red-500 p-1 rounded-full ${textColor}`}
-            >
-              <Trash2 className="h-5 w-5" />
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-4 max-h-64 overflow-auto">
-          <p className={`text-sm whitespace-pre-wrap ${textColor}`}>
-            {note.Content}
-          </p>
-        </CardContent>
-      </Card>
+              {note.Title}
+            </CardTitle>
+            <div className="absolute top-2 right-2 flex space-x-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDialogOpen(true);
+                }}
+                className={`hover:bg-gray-800 hover:text-white p-1 rounded-full ${textColor}`}
+              >
+                <Pen className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(note.$id);
+                }}
+                className={`hover:bg-gray-800 hover:text-red-500 p-1 rounded-full ${textColor}`}
+              >
+                <Trash2 className="h-5 w-5" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4 max-h-64 overflow-auto">
+            <p className={`text-sm whitespace-pre-wrap ${textColor}`}>
+              {note.Content}
+            </p>
+          </CardContent>
+        </Card>
+      </motion.div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-gray-800 text-gray-100 p-6 rounded-lg">
           <DialogHeader>
