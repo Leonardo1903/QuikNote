@@ -67,7 +67,7 @@ DashBoard:
 
 ## Demo
 
-https://quik-note.vercel.app/
+[Live Demo](https://quiknote.leonardo1903.me/)
 
 
 ## License
