@@ -1,5 +1,6 @@
 # QuikNote
-A Full-Stack Sticky Notes Application
+A full-stack sticky notes application designed to provide users with a seamless and intuitive note-taking experience. It allows users to securely authenticate, create, organize, and manage their notes with advanced features like drag-and-drop functionality and personalized dashboards.
+
 ## Features
 
 - Secure User Authentication
