@@ -8,6 +8,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
 
   useEffect(() => {
     checkAuthStatus();
@@ -61,9 +62,17 @@ export const AuthProvider = ({ children }) => {
     try {
       const accountDetails = await authService.checkAuthStatus();
       setUser(accountDetails);
+      if (accountDetails?.prefs?.profileImageId) {
+        setProfileImageUrl(
+          authService.getProfileImageUrl(accountDetails.prefs.profileImageId)
+        );
+      } else {
+        setProfileImageUrl(null);
+      }
     } catch (error) {
       console.error("User is not authenticated", error);
       setUser(null);
+      setProfileImageUrl(null);
     } finally {
       setLoading(false);
     }
@@ -72,6 +81,7 @@ export const AuthProvider = ({ children }) => {
   const contextData = {
     loading,
     user,
+    profileImageUrl,
     loginUser,
     logoutUser,
     registerUser,

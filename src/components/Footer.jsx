@@ -1,26 +1,29 @@
-import { Link } from "react-router-dom";
+import Logo from "../../public/Logo.png";
 
 export default function Footer() {
   return (
-    <footer className="w-full py-6 px-4 md:px-6 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
-      <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-        <p className="text-sm text-gray-400">
-          © 2024 QuikNote. All rights reserved.
+    <footer className="py-12 border-t border-slate-200 dark:border-slate-800 px-6">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+        <div className="flex items-center gap-2 opacity-60">
+          <img src={Logo} alt="QuikNote" className="w-24" />
+        </div>
+        <div className="flex flex-wrap justify-center gap-8 text-sm font-semibold text-slate-500 dark:text-slate-400">
+          <a className="hover:text-primary transition-colors" href="#">
+            Privacy
+          </a>
+          <a className="hover:text-primary transition-colors" href="#">
+            Terms
+          </a>
+          <a className="hover:text-primary transition-colors" href="#">
+            Twitter
+          </a>
+          <a className="hover:text-primary transition-colors" href="#">
+            LinkedIn
+          </a>
+        </div>
+        <p className="text-slate-400 dark:text-slate-500 text-sm">
+          © 2026 QuikNote. All rights reserved.
         </p>
-        <nav className="flex gap-4 sm:gap-6">
-          <Link
-            className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
-            href="#"
-          >
-            Terms of Service
-          </Link>
-          <Link
-            className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
-            href="#"
-          >
-            Privacy Policy
-          </Link>
-        </nav>
       </div>
     </footer>
   );

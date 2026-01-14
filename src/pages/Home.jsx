@@ -1,13 +1,21 @@
-import { Navbar, Hero, Features, Benefits, CTA, Footer } from "../components";
+import {
+  Navbar,
+  Hero,
+  Features,
+  Benefits,
+  CTA as CallToAction,
+  Footer,
+} from "../components";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-gray-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-background">
       <Navbar />
+
       <Hero />
       <Features />
       <Benefits />
-      <CTA />
+      <CallToAction />
       <Footer />
     </div>
   );

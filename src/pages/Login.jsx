@@ -1,126 +1,153 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Mail, Lock, PencilLine, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../context/authContext";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Label } from "../components/ui/label";
-import { Separator } from "../components/ui/separator";
-import { useToast } from "../hooks/use-toast";
-import { Lock, Mail } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
-export default function Login() {
+const Login = () => {
+  const { loginUser, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const { loginUser } = useAuth();
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const userInfo = { email, password };
-      loginUser(userInfo);
-      toast({
-        title: "Success",
-        description: "Logged in successfully",
-        variant: "default",
-      });
+      await loginUser(userInfo);
+      toast.success("Logged in successfully!");
       setEmail("");
       setPassword("");
       navigate("/dashboard");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to login. Please try again.");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 px-4">
-      <Card className="w-full max-w-md bg-gray-800/60 backdrop-blur-sm border-gray-700">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold tracking-tight text-purple-400">
-            Login to QuikNote
-          </CardTitle>
-          <CardDescription className="text-gray-300">
-            Enter your email and password to access your account
-          </CardDescription>
-          <Separator className="bg-gray-700" />
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-200">
-                Email
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background text-foreground font-sans">
+      <div className="w-full max-w-105">
+        <div className="bg-card rounded-xl shadow-xl shadow-border/10 p-8 sm:p-10 border border-border">
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="bg-primary aspect-square rounded-xl size-12 flex items-center justify-center shadow-lg shadow-primary/30 mb-6 transform hover:scale-105 transition-transform duration-300">
+              <PencilLine className="text-primary-foreground w-7 h-7" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">
+              Welcome Back
+            </h1>
+            <p className="text-muted-foreground mt-2 text-sm font-medium">
+              Please enter your details to login
+            </p>
+          </div>
+          <form className="space-y-5" onSubmit={handleLogin}>
+            <div className="space-y-1.5">
+              <Label className="ml-1" htmlFor="email">
+                Email Address
               </Label>
-              <div className="relative">
-                <Mail
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={18}
-                />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="text-muted-foreground w-5 h-5 group-focus-within:text-primary transition-colors" />
+                </div>
                 <Input
+                  className="pl-11 pr-4 py-3.5 rounded-xl font-medium"
                   id="email"
+                  name="email"
+                  placeholder="name@company.com"
+                  required
                   type="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
-                  required
+                  disabled={loading}
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-200">
-                Password
-              </Label>
-              <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={18}
-                />
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label className="ml-1" htmlFor="password">
+                  Password
+                </Label>
+                <a
+                  className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors hover:underline"
+                  href="#"
+                >
+                  Forgot Password?
+                </a>
+              </div>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="text-muted-foreground w-5 h-5 group-focus-within:text-primary transition-colors" />
+                </div>
                 <Input
+                  className="pl-11 pr-11 py-3.5 rounded-xl font-medium"
                   id="password"
-                  type="password"
+                  name="password"
+                  placeholder="••••••••"
+                  required
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
-                  required
+                  disabled={loading}
                 />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-primary focus:outline-none"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  disabled={loading}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
             </div>
             <Button
+              className="w-full py-3.5 px-4 rounded-xl font-bold mt-6"
               type="submit"
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white transition-all duration-200 ease-in-out "
+              disabled={loading}
             >
-              Log In
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
-          <div className="mt-4 flex items-center justify-between">
-            <Separator className="w-1/3 bg-gray-700" />
-            <span className="text-sm text-gray-400">or</span>
-            <Separator className="w-1/3 bg-gray-700" />
+          <div className="mt-6 text-center">
+            <p className="text-sm font-medium text-muted-foreground">
+              Don't have an account?{" "}
+              <Link
+                className="text-primary hover:text-primary/80 font-bold transition-colors hover:underline"
+                to="/signup"
+              >
+                Sign Up
+              </Link>
+            </p>
           </div>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <p className="text-sm text-gray-400">
-            Don&apos;t have an account?{" "}
-            <span className="text-purple-400 hover:text-purple-300 transition-colors duration-200">
-              <Link to="/signup">Sign up</Link>
-            </span>
+        </div>
+        <div className="text-center mt-8">
+          <p className="text-xs text-muted-foreground font-medium">
+            © 2026 QuikNote Inc.
+            <a
+              className="hover:text-foreground ml-2 transition-colors"
+              href="#"
+            >
+              Privacy
+            </a>
+            <span className="mx-1">·</span>
+            <a className="hover:text-foreground transition-colors" href="#">
+              Terms
+            </a>
           </p>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default Login;

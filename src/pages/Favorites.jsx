@@ -1,13 +1,16 @@
-import { Sidebar, Header, MainGrid } from "@/components";
+import React from "react";
+import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
+import MainGrid from "@/components/MainGrid";
 import { useNotes } from "@/context/notesContext";
 import { useNoteModal } from "@/context/noteModalContext";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 
-export default function Dashboard() {
-  const { getActiveNotes, loading, toggleFavorite, trashNote } = useNotes();
+export default function Favorites() {
+  const { getFavoriteNotes, loading, toggleFavorite, trashNote } = useNotes();
   const { openNewNoteModal, openEditNoteModal } = useNoteModal();
-  const notes = getActiveNotes();
+  const favoriteNotes = getFavoriteNotes();
 
   const handleToggleFavorite = async (note) => {
     try {
@@ -32,7 +35,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="overflow-hidden h-screen flex">
-        <Sidebar activePage="all" onNewNote={openNewNoteModal} />
+        <Sidebar activePage="favorites" onNewNote={openNewNoteModal} />
         <main className="flex-1 flex items-center justify-center">
           <Spinner className="h-16 w-16 text-primary" />
         </main>
@@ -42,11 +45,11 @@ export default function Dashboard() {
 
   return (
     <div className="overflow-hidden h-screen flex">
-      <Sidebar activePage="all" onNewNote={openNewNoteModal} />
+      <Sidebar activePage="favorites" onNewNote={openNewNoteModal} />
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        <Header notesCount={notes.length} title="All Notes" />
+        <Header notesCount={favoriteNotes.length} title="Favorites" />
         <MainGrid
-          notes={notes}
+          notes={favoriteNotes}
           onEditNote={openEditNoteModal}
           onToggleFavorite={handleToggleFavorite}
           onTrashNote={handleTrashNote}
