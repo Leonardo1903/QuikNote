@@ -75,7 +75,7 @@ function AppContent() {
 
 function App() {
   return (
-    <ThemeProvider>
+    <ThemeProvider defaultTheme="light">
       <AuthProvider>
         <NotesProvider>
           <NoteModalProvider>
