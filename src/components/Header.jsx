@@ -17,7 +17,6 @@ export default function Header({
   return (
     <header className="flex-shrink-0 px-8 py-5 flex flex-col gap-6 z-10 bg-background/90 dark:bg-background/90 backdrop-blur-md sticky top-0">
       <div className="flex justify-between items-center gap-6">
-        {/* Search Bar */}
         <div className="flex-1 max-w-2xl">
           <div className="relative group">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -41,7 +40,6 @@ export default function Header({
           </div>
         </div>
 
-        {/* Controls */}
         <div className="flex items-center gap-3">
           <div className="bg-white dark:bg-card p-1 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex">
             <button
@@ -89,7 +87,6 @@ export default function Header({
         </div>
       </div>
 
-      {/* Trash Tabs */}
       {isTrash && (
         <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
           <TabsList className="w-fit">

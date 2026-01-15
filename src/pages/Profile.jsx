@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { LogOut, Camera } from "lucide-react";
 import { toast } from "sonner";
-import Sidebar from "@/components";
+import { Sidebar } from "@/components";
 import { useTheme } from "@/context/themeContext";
 import { useAuth } from "@/context/authContext";
 import { authService } from "@/appwrite/auth";
@@ -220,7 +220,7 @@ export default function Profile() {
               <div className="relative group">
                 <Avatar className="h-32 w-32 border-4 border-slate-50 dark:border-slate-800 shadow-md">
                   <AvatarImage src={profileImage} alt="Profile" />
-                  <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white text-3xl font-bold">
+                  <AvatarFallback className="bg-linear-to-br from-primary to-purple-600 text-white text-3xl font-bold">
                     {fullName
                       .split(" ")
                       .map((n) => n[0])
@@ -233,7 +233,7 @@ export default function Profile() {
                   className="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform cursor-pointer"
                 >
                   {uploadingImage ? (
-                    <div className="w-[18px] h-[18px] border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4.5 h-4.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <Camera size={18} />
                   )}
@@ -258,9 +258,9 @@ export default function Profile() {
                   </span>
                 </div>
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-card dark:bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+            <Card className="overflow-hidden">
               <div className="p-6 border-b border-border">
                 <h4 className="text-lg font-bold text-foreground">
                   Personal Information
@@ -290,7 +290,9 @@ export default function Profile() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Current Password (required to change email)</Label>
+                    <Label htmlFor="currentPassword">
+                      Current Password (required to change email)
+                    </Label>
                     <Input
                       id="currentPassword"
                       type="password"
@@ -327,10 +329,7 @@ export default function Profile() {
                 </div>
               </div>
               <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
-                <Button
-                  onClick={handleSave}
-                  disabled={saving}
-                >
+                <Button onClick={handleSave} disabled={saving}>
                   {saving ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
@@ -389,7 +388,7 @@ export default function Profile() {
                   </div>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
       </main>
