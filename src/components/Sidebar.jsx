@@ -354,7 +354,6 @@ export default function Sidebar({
             <span className="text-sm font-bold text-slate-900 dark:text-white">
               {user?.name || "User"}
             </span>
-            <span className="text-xs text-slate-500">Pro Plan</span>
           </div>
           <ChevronDown className="ml-auto text-slate-400" size={18} />
         </Link>
