@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
-import MainGrid from "@/components/MainGrid";
-import ConfirmDialog from "@/components/ConfirmDialog";
+import { Sidebar, MainGrid, Header, ConfirmDialog } from "@/components";
 import { useNotes } from "@/context/notesContext";
 import { useNoteModal } from "@/context/noteModalContext";
 import { Spinner } from "@/components/ui/spinner";
@@ -12,6 +9,8 @@ export default function Trash() {
   const [activeTab, setActiveTab] = useState("notes");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isEmptyingTrash, setIsEmptyingTrash] = useState(false);
+  const [view, setView] = useState("grid");
+  const [searchQuery, setSearchQuery] = useState("");
   const {
     getTrashedNotes,
     getTrashedNotebooks,
@@ -26,6 +25,30 @@ export default function Trash() {
 
   const deletedNotes = getTrashedNotes();
   const deletedNotebooks = getTrashedNotebooks();
+
+  const filterItems = (items) => {
+    if (!searchQuery.trim()) return items;
+    const query = searchQuery.toLowerCase();
+    return items.filter((item) => {
+      const title = (item.title || item.name || "").toLowerCase();
+      const content = (item.content || item.description || "").toLowerCase();
+      const tags = (item.tags || []).map((tag) => tag.toLowerCase());
+
+      return (
+        title.includes(query) ||
+        content.includes(query) ||
+        tags.some((tag) => tag.includes(query))
+      );
+    });
+  };
+
+  const filteredDeletedNotes = filterItems(deletedNotes);
+  const filteredDeletedNotebooks = filterItems(deletedNotebooks);
+
+  const totalItems =
+    activeTab === "notes"
+      ? filteredDeletedNotes.length
+      : filteredDeletedNotebooks.length;
 
   const handleRestoreNote = async (note) => {
     try {
@@ -86,9 +109,6 @@ export default function Trash() {
     }
   };
 
-  const totalItems =
-    activeTab === "notes" ? deletedNotes.length : deletedNotebooks.length;
-
   if (loading) {
     return (
       <div className="overflow-hidden h-screen flex">
@@ -111,12 +131,19 @@ export default function Trash() {
           onEmptyTrash={handleEmptyTrashClick}
           activeTab={activeTab}
           onTabChange={setActiveTab}
+          view={view}
+          onViewChange={setView}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
         />
         <MainGrid
           notes={
             activeTab === "notes"
-              ? deletedNotes.map((note) => ({ ...note, isTrashed: true }))
-              : deletedNotebooks.map((notebook) => ({
+              ? filteredDeletedNotes.map((note) => ({
+                  ...note,
+                  isTrashed: true,
+                }))
+              : filteredDeletedNotebooks.map((notebook) => ({
                   ...notebook,
                   isTrashed: true,
                   isNotebook: true,
@@ -126,10 +153,10 @@ export default function Trash() {
           onRestoreNote={handleRestoreNote}
           onDeleteNote={handleDeletePermanently}
           onDeleteNotebook={handleDeleteNotebook}
+          view={view}
         />
       </main>
 
-      {/* Confirm Dialog */}
       <ConfirmDialog
         isOpen={showConfirmDialog}
         title="Empty Trash?"

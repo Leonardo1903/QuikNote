@@ -7,6 +7,8 @@ import { authService } from "@/appwrite/auth";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 function Signup() {
   const [form, setForm] = useState({
@@ -61,7 +63,6 @@ function Signup() {
         password: form.password,
       });
 
-      // Upload profile image if provided
       if (profileImage) {
         try {
           const uploaded = await authService.uploadProfileImage(profileImage);
@@ -74,7 +75,6 @@ function Signup() {
           checkAuthStatus?.();
         } catch (error) {
           console.error("Failed to upload profile image:", error);
-          // Don't block signup if image upload fails
         }
       }
 
@@ -91,7 +91,7 @@ function Signup() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background text-foreground font-sans">
       <div className="w-full max-w-105">
-        <div className="bg-card rounded-xl shadow-xl shadow-border/10 p-8 sm:p-10 border border-border">
+        <Card className="p-8 sm:p-10 shadow-xl shadow-border/10">
           <div className="flex flex-col items-center text-center mb-8">
             <div className="bg-primary aspect-square rounded-xl size-12 flex items-center justify-center shadow-lg shadow-primary/30 mb-6 transform hover:scale-105 transition-transform duration-300">
               <User className="text-primary-foreground w-7 h-7" />
@@ -106,19 +106,15 @@ function Signup() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="flex flex-col items-center mb-2">
               <div className="relative group">
-                {profileImagePreview ? (
-                  <div className="size-24 rounded-full border-4 border-slate-200 dark:border-slate-700 shadow-md overflow-hidden">
-                    <img
-                      src={profileImagePreview}
-                      alt="Profile preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="size-24 rounded-full bg-gradient-to-br from-primary to-purple-600 border-4 border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center">
-                    <User className="text-white w-12 h-12" />
-                  </div>
-                )}
+                <Avatar className="h-24 w-24 border-4 border-slate-200 dark:border-slate-700 shadow-md">
+                  <AvatarImage
+                    src={profileImagePreview || undefined}
+                    alt="Profile preview"
+                  />
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white">
+                    <User className="w-12 h-12" />
+                  </AvatarFallback>
+                </Avatar>
                 <label
                   htmlFor="signup-image-upload"
                   className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform cursor-pointer"
@@ -271,7 +267,7 @@ function Signup() {
               </Link>
             </p>
           </div>
-        </div>
+        </Card>
         <div className="text-center mt-8">
           <p className="text-xs text-muted-foreground font-medium">
             © 2026 QuikNote Inc.

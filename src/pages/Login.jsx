@@ -6,6 +6,7 @@ import { useAuth } from "../context/authContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 const Login = () => {
   const { loginUser, loading } = useAuth();
@@ -31,7 +32,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background text-foreground font-sans">
       <div className="w-full max-w-105">
-        <div className="bg-card rounded-xl shadow-xl shadow-border/10 p-8 sm:p-10 border border-border">
+        <Card className="p-8 sm:p-10 shadow-xl shadow-border/10">
           <div className="flex flex-col items-center text-center mb-8">
             <div className="bg-primary aspect-square rounded-xl size-12 flex items-center justify-center shadow-lg shadow-primary/30 mb-6 transform hover:scale-105 transition-transform duration-300">
               <PencilLine className="text-primary-foreground w-7 h-7" />
@@ -129,7 +130,7 @@ const Login = () => {
               </Link>
             </p>
           </div>
-        </div>
+        </Card>
         <div className="text-center mt-8">
           <p className="text-xs text-muted-foreground font-medium">
             © 2026 QuikNote Inc.

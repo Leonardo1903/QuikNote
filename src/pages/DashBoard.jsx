@@ -3,11 +3,28 @@ import { useNotes } from "@/context/notesContext";
 import { useNoteModal } from "@/context/noteModalContext";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function Dashboard() {
   const { getActiveNotes, loading, toggleFavorite, trashNote } = useNotes();
   const { openNewNoteModal, openEditNoteModal } = useNoteModal();
   const notes = getActiveNotes();
+  const [view, setView] = useState("grid");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredNotes = notes.filter((note) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    const title = (note.title || "").toLowerCase();
+    const content = (note.content || "").toLowerCase();
+    const tags = (note.tags || []).map((tag) => tag.toLowerCase());
+
+    return (
+      title.includes(query) ||
+      content.includes(query) ||
+      tags.some((tag) => tag.includes(query))
+    );
+  });
 
   const handleToggleFavorite = async (note) => {
     try {
@@ -44,12 +61,20 @@ export default function Dashboard() {
     <div className="overflow-hidden h-screen flex">
       <Sidebar activePage="all" onNewNote={openNewNoteModal} />
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        <Header notesCount={notes.length} title="All Notes" />
+        <Header
+          notesCount={filteredNotes.length}
+          title="All Notes"
+          view={view}
+          onViewChange={setView}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
         <MainGrid
-          notes={notes}
+          notes={filteredNotes}
           onEditNote={openEditNoteModal}
           onToggleFavorite={handleToggleFavorite}
           onTrashNote={handleTrashNote}
+          view={view}
         />
       </main>
     </div>

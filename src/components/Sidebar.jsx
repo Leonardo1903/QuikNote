@@ -3,10 +3,10 @@ import {
   Book,
   ChevronDown,
   ChevronUp,
+  Edit2,
   FileText,
   MoreHorizontal,
   Plus,
-  User,
   Star,
   Trash,
   Trash2,
@@ -17,6 +17,15 @@ import Logo from "../../public/Logo.png";
 import { useNotes } from "@/context/notesContext";
 import { useAuth } from "@/context/authContext";
 import ConfirmDialog from "./ConfirmDialog";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 export default function Sidebar({
   activePage = "all",
@@ -32,7 +41,6 @@ export default function Sidebar({
   const [newNotebookName, setNewNotebookName] = useState("");
   const [showNotebooksMenu, setShowNotebooksMenu] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [openMenuId, setOpenMenuId] = useState(null);
   const [editingNotebook, setEditingNotebook] = useState(null);
   const [editName, setEditName] = useState("");
   const menuRef = useRef(null);
@@ -40,7 +48,7 @@ export default function Sidebar({
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setOpenMenuId(null);
+        // menu closed
       }
     }
 
@@ -100,12 +108,12 @@ export default function Sidebar({
   const activeNotebooks = notebooks.filter((nb) => !nb.isTrashed);
 
   return (
-    <aside className="w-64 bg-white dark:bg-card h-full flex flex-col border-r border-slate-200 dark:border-slate-800 flex-shrink-0 z-20">
+    <aside className="w-64 bg-white dark:bg-card h-full flex flex-col border-r border-slate-200 dark:border-slate-800 shrink-0 z-20">
       <div className="p-6 pb-2">
         <div className="flex items-center">
           <img src={Logo} alt="QuikNote Logo" className="w-32 mb-4" />
         </div>
-        <button
+        <Button
           onClick={onNewNote}
           className="w-full bg-primary hover:bg-primary/90 transition-colors text-white font-bold h-10 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 group"
         >
@@ -114,7 +122,7 @@ export default function Sidebar({
             size={20}
           />
           <span>New Note</span>
-        </button>
+        </Button>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-2 space-y-8 no-scrollbar">
@@ -192,22 +200,20 @@ export default function Sidebar({
                 autoFocus
               />
               <div className="flex gap-2 mt-2">
-                <button
-                  type="submit"
-                  className="flex-1 px-3 py-1 text-sm bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors font-medium"
-                >
+                <Button type="submit" className="flex-1 h-8 text-sm">
                   Create
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={() => {
                     setShowNotebookForm(false);
                     setNewNotebookName("");
                   }}
-                  className="flex-1 px-3 py-1 text-sm bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+                  className="flex-1 h-8 text-sm"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           )}
@@ -239,21 +245,22 @@ export default function Sidebar({
                           }}
                         />
                         <div className="flex gap-2 mt-2">
-                          <button
+                          <Button
                             onClick={() => handleUpdateNotebook(notebook.$id)}
-                            className="flex-1 px-3 py-1 text-sm bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors font-medium"
+                            className="flex-1 h-8 text-sm"
                           >
                             Save
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="secondary"
                             onClick={() => {
                               setEditingNotebook(null);
                               setEditName("");
                             }}
-                            className="flex-1 px-3 py-1 text-sm bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+                            className="flex-1 h-8 text-sm"
                           >
                             Cancel
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
@@ -276,46 +283,42 @@ export default function Sidebar({
                           />
                           <span className="truncate">{notebook.name}</span>
                         </Link>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenMenuId(
-                              openMenuId === notebook.$id ? null : notebook.$id
-                            );
-                          }}
-                          className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all relative"
-                          title="Options"
-                        >
-                          <MoreHorizontal size={18} />
-                          {openMenuId === notebook.$id && (
-                            <div
-                              ref={menuRef}
-                              className="absolute right-0 mt-1 w-40 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50"
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => e.stopPropagation()}
+                              className="opacity-0 group-hover:opacity-100 h-auto w-auto p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all"
+                              title="Options"
                             >
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setEditingNotebook(notebook.$id);
-                                  setEditName(notebook.name);
-                                  setOpenMenuId(null);
-                                }}
-                                className="w-full text-left px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
-                              >
-                                Edit Name
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteConfirm(notebook);
-                                  setOpenMenuId(null);
-                                }}
-                                className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                              >
-                                Move to Trash
-                              </button>
-                            </div>
-                          )}
-                        </button>
+                              <MoreHorizontal size={18} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingNotebook(notebook.$id);
+                                setEditName(notebook.name);
+                              }}
+                              className="cursor-pointer"
+                            >
+                              <Edit2 size={16} className="mr-2" />
+                              Edit Name
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteConfirm(notebook);
+                              }}
+                              className="text-red-600 dark:text-red-400 cursor-pointer"
+                            >
+                              <Trash size={16} className="mr-2" />
+                              Move to Trash
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     )}
                   </div>
@@ -326,36 +329,27 @@ export default function Sidebar({
         </div>
       </div>
 
-      <div className="px-4 pb-4 pt-3 border-t border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-card">
+      <Separator />
+
+      <div className="px-4 pb-4 pt-3 bg-white dark:bg-card">
         <Link
           to="/profile"
           className="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border border-transparent"
         >
-          {profileImageUrl ? (
-            <div
-              className="size-10 rounded-full border-2 border-white dark:border-slate-700 shadow-sm overflow-hidden"
-              aria-label="User profile picture"
-            >
-              <img
-                src={profileImageUrl}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div
-              className="size-10 rounded-full bg-gradient-to-br from-primary to-purple-600 border-2 border-white dark:border-slate-700 shadow-sm flex items-center justify-center"
-              aria-label="User profile picture"
-            >
-              <span className="text-sm font-bold text-white">
-                {user?.name
-                  ?.split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase() || "U"}
-              </span>
-            </div>
-          )}
+          <Avatar className="size-10 border-2 border-white dark:border-slate-700 shadow-sm">
+            <AvatarImage
+              src={profileImageUrl}
+              alt={user?.name || "User"}
+              className="object-cover"
+            />
+            <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white text-sm font-bold">
+              {user?.name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase() || "U"}
+            </AvatarFallback>
+          </Avatar>
           <div className="flex flex-col items-start">
             <span className="text-sm font-bold text-slate-900 dark:text-white">
               {user?.name || "User"}

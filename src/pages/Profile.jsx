@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
-import { ChevronRight, LogOut, Camera } from "lucide-react";
+import { LogOut, Camera } from "lucide-react";
 import { toast } from "sonner";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components";
 import { useTheme } from "@/context/themeContext";
 import { useAuth } from "@/context/authContext";
 import { authService } from "@/appwrite/auth";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function Profile() {
   const { theme, setTheme } = useTheme();
@@ -86,16 +91,13 @@ export default function Profile() {
 
     setUploadingImage(true);
     try {
-      // Delete old image if exists
       if (profileImageId) {
         await authService.deleteProfileImage(profileImageId);
       }
 
-      // Upload new image
       const uploaded = await authService.uploadProfileImage(file);
       const imageUrl = authService.getProfileImageUrl(uploaded.$id);
 
-      // Update preferences with new image ID
       await authService.updatePreferences({
         profileImageId: uploaded.$id,
         username,
@@ -104,7 +106,7 @@ export default function Profile() {
       });
 
       setProfileImageId(uploaded.$id);
-      setProfileImage(imageUrl + "?v=" + Date.now()); // Add cache buster
+      setProfileImage(imageUrl + "?v=" + Date.now());
       checkAuthStatus?.();
       toast.success("Profile image updated");
     } catch (error) {
@@ -198,13 +200,14 @@ export default function Profile() {
             <header className="px-0 py-5 flex flex-col gap-6 border-b border-border mb-6">
               <div className="flex justify-between items-center gap-6">
                 <div className="flex items-center gap-3">
-                  <button
+                  <Button
                     onClick={logoutUser}
-                    className="flex items-center gap-2 bg-card dark:bg-card px-4 py-2.5 rounded-xl shadow-sm border border-border text-sm font-semibold text-destructive hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                    variant="outline"
+                    className="flex items-center gap-2"
                   >
                     <LogOut size={20} />
                     <span>Logout</span>
-                  </button>
+                  </Button>
                 </div>
               </div>
               <div className="flex items-end justify-between">
@@ -213,27 +216,18 @@ export default function Profile() {
                 </h2>
               </div>
             </header>
-            <div className="bg-card dark:bg-card rounded-xl p-8 shadow-sm border border-border flex flex-col md:flex-row items-center gap-8">
+            <Card className="flex flex-col md:flex-row items-center gap-8 p-8">
               <div className="relative group">
-                {profileImage ? (
-                  <div className="size-32 rounded-full border-4 border-slate-50 dark:border-slate-800 shadow-md overflow-hidden">
-                    <img
-                      src={profileImage}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="size-32 rounded-full bg-gradient-to-br from-primary to-purple-600 border-4 border-slate-50 dark:border-slate-800 shadow-md flex items-center justify-center">
-                    <span className="text-4xl font-bold text-white">
-                      {fullName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase() || "U"}
-                    </span>
-                  </div>
-                )}
+                <Avatar className="h-32 w-32 border-4 border-slate-50 dark:border-slate-800 shadow-md">
+                  <AvatarImage src={profileImage} alt="Profile" />
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white text-3xl font-bold">
+                    {fullName
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
                 <label
                   htmlFor="profile-image-upload"
                   className="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform cursor-pointer"
@@ -278,33 +272,27 @@ export default function Profile() {
               <div className="p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Full Name
-                    </label>
-                    <input
-                      className="block w-full rounded-lg border border-border dark:bg-slate-800/50 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3"
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Email Address
-                    </label>
-                    <input
-                      className="block w-full rounded-lg border border-border dark:bg-slate-800/50 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3"
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input
+                      id="email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Current Password (required to change email)
-                    </label>
-                    <input
-                      className="block w-full rounded-lg border border-border dark:bg-slate-800/50 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3"
+                    <Label htmlFor="currentPassword">Current Password (required to change email)</Label>
+                    <Input
+                      id="currentPassword"
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
@@ -312,15 +300,14 @@ export default function Profile() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Username
-                    </label>
-                    <div className="flex rounded-md shadow-sm">
-                      <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-border bg-slate-50 dark:bg-slate-800 text-slate-500 sm:text-sm">
+                    <Label htmlFor="username">Username</Label>
+                    <div className="flex rounded-lg overflow-hidden border border-input">
+                      <span className="inline-flex items-center px-3 bg-slate-50 dark:bg-slate-800 text-slate-500 text-sm font-medium">
                         @
                       </span>
-                      <input
-                        className="flex-1 min-w-0 block w-full px-3 py-2.5 rounded-none rounded-r-lg border-border dark:bg-slate-800/50 dark:text-white focus:border-primary focus:ring-primary sm:text-sm"
+                      <Input
+                        id="username"
+                        className="rounded-none border-0 flex-1"
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
@@ -328,11 +315,9 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Phone Number
-                    </label>
-                    <input
-                      className="block w-full rounded-lg border border-border dark:bg-slate-800/50 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3"
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
                       type="tel"
                       placeholder="+1 (555) 000-0000"
                       value={phone}
@@ -342,17 +327,16 @@ export default function Profile() {
                 </div>
               </div>
               <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
-                <button
+                <Button
                   onClick={handleSave}
                   disabled={saving}
-                  className="bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-lg shadow-sm transition-colors"
                 >
                   {saving ? "Saving..." : "Save Changes"}
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-card dark:bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+            <Card className="overflow-hidden">
               <div className="p-6 border-b border-border">
                 <h4 className="text-lg font-bold text-foreground">
                   App Preferences
@@ -363,9 +347,7 @@ export default function Profile() {
               </div>
               <div className="p-6 space-y-6">
                 <div>
-                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3 block">
-                    Theme
-                  </label>
+                  <Label className="mb-3 block">Theme</Label>
                   <div className="grid grid-cols-2 gap-4">
                     {["light", "dark"].map((t) => (
                       <label key={t} className="cursor-pointer group">

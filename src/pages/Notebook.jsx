@@ -4,12 +4,15 @@ import { useNoteModal } from "@/context/noteModalContext";
 import { Spinner } from "@/components/ui/spinner";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function Notebook() {
   const [searchParams] = useSearchParams();
   const notebookId = searchParams.get("id");
   const { notes, notebooks, loading, toggleFavorite, trashNote } = useNotes();
   const { openNewNoteModal, openEditNoteModal } = useNoteModal();
+  const [view, setView] = useState("grid");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const notebookNotes = notebookId
     ? notes.filter((note) => !note.isTrashed && note.notebooks === notebookId)
@@ -17,6 +20,20 @@ export default function Notebook() {
 
   const currentNotebook = notebooks.find((nb) => nb.$id === notebookId);
   const notebookName = currentNotebook?.name || "Notebook";
+
+  const filteredNotes = notebookNotes.filter((note) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    const title = (note.title || "").toLowerCase();
+    const content = (note.content || "").toLowerCase();
+    const tags = (note.tags || []).map((tag) => tag.toLowerCase());
+
+    return (
+      title.includes(query) ||
+      content.includes(query) ||
+      tags.some((tag) => tag.includes(query))
+    );
+  });
 
   const handleToggleFavorite = async (note) => {
     try {
@@ -61,12 +78,20 @@ export default function Notebook() {
         onNewNote={openNewNoteModal}
       />
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        <Header notesCount={notebookNotes.length} title={notebookName} />
+        <Header
+          notesCount={filteredNotes.length}
+          title={notebookName}
+          view={view}
+          onViewChange={setView}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
         <MainGrid
-          notes={notebookNotes}
+          notes={filteredNotes}
           onEditNote={openEditNoteModal}
           onToggleFavorite={handleToggleFavorite}
           onTrashNote={handleTrashNote}
+          view={view}
         />
       </main>
     </div>

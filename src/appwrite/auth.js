@@ -4,9 +4,8 @@ import { ID } from "appwrite";
 export const authService = {
   loginUser: async (email, password) => {
     try {
-      // Login user
       await account.createEmailPasswordSession({ email, password });
-      // Get user details after login
+      
       const user = await account.get();
       return user;
     } catch (error) {
@@ -17,7 +16,6 @@ export const authService = {
 
   logoutUser: async () => {
     try {
-      // Logout user
       await account.deleteSession({ sessionId: "current" });
       return true;
     } catch (error) {
@@ -28,7 +26,6 @@ export const authService = {
 
   registerUser: async (email, password, name) => {
     try {
-      // Register the user
       await account.create({
         userId: ID.unique(),
         email,
@@ -36,10 +33,8 @@ export const authService = {
         name,
       });
 
-      // Automatically log in the user after registration
       await account.createEmailPasswordSession({ email, password });
 
-      // Fetch user details
       const user = await account.get();
       return user;
     } catch (error) {
@@ -50,7 +45,6 @@ export const authService = {
 
   checkAuthStatus: async () => {
     try {
-      // Check if the user is authenticated
       const session = await account.getSession({ sessionId: "current" });
       if (session) {
         const user = await account.get();

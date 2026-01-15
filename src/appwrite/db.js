@@ -7,7 +7,6 @@ import {
 } from "../lib/config";
 
 export const dbService = {
-  // ==================== NOTES ====================
   createNote: async (note) => {
     try {
       const response = await database.createRow({
@@ -183,7 +182,6 @@ export const dbService = {
     }
   },
 
-  // ==================== NOTEBOOKS ====================
   createNotebook: async (notebook) => {
     try {
       const response = await database.createRow({

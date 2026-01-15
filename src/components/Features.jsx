@@ -13,7 +13,6 @@ export default function Features() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[280px]">
-          {/* Dynamic Note Cards */}
           <div className="md:col-span-8 bg-white dark:bg-card border border-slate-200/60 dark:border-slate-700 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 group flex flex-col justify-between overflow-hidden relative">
             <div className="relative z-10">
               <FileEdit className="text-primary w-10 h-10 mb-4" />
@@ -35,7 +34,6 @@ export default function Features() {
             </div>
           </div>
 
-          {/* Instant Performance */}
           <div className="md:col-span-4 bg-white dark:bg-card border border-slate-200/60 dark:border-slate-700 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 flex flex-col justify-end">
             <Zap className="text-primary w-10 h-10 mb-4" />
             <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">Instant Performance</h3>
@@ -45,7 +43,6 @@ export default function Features() {
             </p>
           </div>
 
-          {/* Instant Search */}
           <div className="md:col-span-4 bg-white dark:bg-card border border-slate-200/60 dark:border-slate-700 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 flex flex-col justify-end">
             <Search className="text-primary w-10 h-10 mb-4" />
             <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">
@@ -57,7 +54,6 @@ export default function Features() {
             </p>
           </div>
 
-          {/* Smart Notebooks */}
           <div className="md:col-span-8 bg-white dark:bg-card border border-slate-200/60 dark:border-slate-700 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 group flex flex-col justify-between overflow-hidden relative">
             <div className="relative z-10">
               <BookOpen className="text-primary w-10 h-10 mb-4" />

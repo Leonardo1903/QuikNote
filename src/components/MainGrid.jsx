@@ -1,15 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
 import {
   Pin,
   MoreHorizontal,
-  Square,
   Star,
   RotateCcw,
   FolderX,
   Trash2,
   Trash,
 } from "lucide-react";
-import { formatTimeAgo, getCategoryColor } from "@/lib/utils";
+import { formatTimeAgo } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 
 export default function MainGrid({
   notes,
@@ -20,35 +27,8 @@ export default function MainGrid({
   onRestoreNote,
   onDeleteNote,
   onDeleteNotebook,
+  view = "grid",
 }) {
-  const [openMenuId, setOpenMenuId] = useState(null);
-  const menuRef = useRef(null);
-  const categoryColors = {
-    indigo:
-      "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300",
-    emerald:
-      "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300",
-    orange:
-      "bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300",
-    purple:
-      "bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300",
-    slate: "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300",
-    blue: "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300",
-    red: "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300",
-  };
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setOpenMenuId(null);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   if (!notes || notes.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -66,17 +46,23 @@ export default function MainGrid({
 
   return (
     <div className="flex-1 overflow-y-auto px-8 pb-10 scroll-smooth">
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6 pb-20">
+      <div
+        className={`${
+          view === "grid"
+            ? "columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+            : "max-w-4xl mx-auto space-y-4"
+        } pb-20`}
+      >
         {notes.map((note) => {
-          // Use $id from Appwrite or fall back to id
           const noteId = note.$id || note.id;
           const timeAgo = formatTimeAgo(note.$updatedAt || note.$createdAt);
-          const categoryColor = getCategoryColor(note.category);
 
           return (
-            <div
+            <Card
               key={noteId}
-              className="break-inside-avoid bg-white dark:bg-card rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:-translate-y-1 transition-all duration-200 group cursor-pointer relative"
+              className={`${
+                view === "grid" ? "break-inside-avoid" : "w-full"
+              } hover:shadow-md hover:-translate-y-1 transition-all duration-200 group cursor-pointer p-5`}
             >
               <div
                 onClick={() => !isTrash && onEditNote && onEditNote(note)}
@@ -135,85 +121,70 @@ export default function MainGrid({
                   </button>
                 </div>
 
-                {/* Note Content */}
                 <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-3 mb-4 whitespace-pre-line">
                   {note.content || note.description || ""}
                 </p>
 
-                {/* Note Footer */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-800/50">
+                <Separator className="mb-4" />
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span
-                      className={`${
-                        isTrash && note.isTrashed
-                          ? "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300"
-                          : categoryColors[categoryColor] ||
-                            categoryColors.slate
-                      } text-[11px] font-bold px-2 py-1 rounded-md uppercase tracking-wider`}
-                    >
-                      {isTrash && note.isTrashed
-                        ? "Deleted"
-                        : note.isNotebook
-                        ? "Notebook"
-                        : note.category || "General"}
-                    </span>
+                    {(isTrash || note.isNotebook) && (
+                      <Badge
+                        className={`${
+                          isTrash && note.isTrashed
+                            ? "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300"
+                            : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
+                        } text-[11px] font-bold px-2 py-1 rounded-md uppercase tracking-wider`}
+                      >
+                        {isTrash && note.isTrashed ? "Deleted" : "Notebook"}
+                      </Badge>
+                    )}
                     <span className="text-xs text-slate-400">{timeAgo}</span>
                   </div>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpenMenuId(openMenuId === noteId ? null : noteId);
-                  }}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors relative"
-                  title="Actions"
-                >
-                  <MoreHorizontal size={20} />
 
-                  {/* Dropdown Menu */}
-                  {openMenuId === noteId && (
-                    <div
-                      ref={menuRef}
-                      className="absolute right-0 mt-1 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50"
-                    >
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                        title="Actions"
+                      >
+                        <MoreHorizontal size={20} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
                       {isTrash ? (
-                        <>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (note.isNotebook) {
-                                onDeleteNotebook && onDeleteNotebook(note);
-                              } else {
-                                onDeleteNote && onDeleteNote(note);
-                              }
-                              setOpenMenuId(null);
-                            }}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
-                          >
-                            <Trash2 size={16} />
-                            Delete Permanently
-                          </button>
-                        </>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (note.isNotebook) {
+                              onDeleteNotebook && onDeleteNotebook(note);
+                            } else {
+                              onDeleteNote && onDeleteNote(note);
+                            }
+                          }}
+                          className="text-red-600 dark:text-red-400 cursor-pointer"
+                        >
+                          <Trash2 size={16} className="mr-2" />
+                          Delete Permanently
+                        </DropdownMenuItem>
                       ) : (
-                        <>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onTrashNote && onTrashNote(note);
-                              setOpenMenuId(null);
-                            }}
-                            className="w-full text-left px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2 transition-colors"
-                          >
-                            <Trash size={16} />
-                            Move to Trash
-                          </button>
-                        </>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onTrashNote && onTrashNote(note);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Trash size={16} className="mr-2" />
+                          Move to Trash
+                        </DropdownMenuItem>
                       )}
-                    </div>
-                  )}
-                </button>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>

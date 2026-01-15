@@ -1,13 +1,6 @@
 import React from "react";
-import {
-  Search,
-  LayoutGrid,
-  List,
-  ArrowDownUp,
-  ChevronDown,
-  FileText,
-  FolderX,
-} from "lucide-react";
+import { Search, LayoutGrid, List, FileText, FolderX } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Header({
   notesCount,
@@ -16,6 +9,10 @@ export default function Header({
   onEmptyTrash,
   activeTab = "notes",
   onTabChange,
+  view = "grid",
+  onViewChange,
+  searchQuery = "",
+  onSearchChange,
 }) {
   return (
     <header className="flex-shrink-0 px-8 py-5 flex flex-col gap-6 z-10 bg-background/90 dark:bg-background/90 backdrop-blur-md sticky top-0">
@@ -33,6 +30,8 @@ export default function Header({
               className="block w-full pl-12 pr-4 py-3.5 bg-white dark:bg-card border-none rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 shadow-sm transition-all"
               placeholder="Search by title, content, or tag..."
               type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
               <span className="text-xs text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-600">
@@ -45,10 +44,26 @@ export default function Header({
         {/* Controls */}
         <div className="flex items-center gap-3">
           <div className="bg-white dark:bg-card p-1 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex">
-            <button className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-primary shadow-sm">
+            <button
+              onClick={() => onViewChange && onViewChange("grid")}
+              className={`p-2 rounded-lg transition-colors ${
+                view === "grid"
+                  ? "bg-slate-100 dark:bg-slate-700 text-primary shadow-sm"
+                  : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              }`}
+              title="Grid View"
+            >
               <LayoutGrid size={20} />
             </button>
-            <button className="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+            <button
+              onClick={() => onViewChange && onViewChange("list")}
+              className={`p-2 rounded-lg transition-colors ${
+                view === "list"
+                  ? "bg-slate-100 dark:bg-slate-700 text-primary shadow-sm"
+                  : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              }`}
+              title="List View"
+            >
               <List size={20} />
             </button>
           </div>
@@ -76,32 +91,18 @@ export default function Header({
 
       {/* Trash Tabs */}
       {isTrash && (
-        <div className="border-b border-slate-200 dark:border-slate-800 -mx-8 px-8">
-          <div className="flex space-x-6 -mb-px">
-            <button
-              onClick={() => onTabChange("notes")}
-              className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === "notes"
-                  ? "text-primary border-primary"
-                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700"
-              }`}
-            >
-              <FileText className="inline-block align-bottom mr-1" size={20} />
+        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+          <TabsList className="w-fit">
+            <TabsTrigger value="notes" className="gap-1.5">
+              <FileText size={16} />
               Deleted Notes
-            </button>
-            <button
-              onClick={() => onTabChange("notebooks")}
-              className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === "notebooks"
-                  ? "text-primary border-primary"
-                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700"
-              }`}
-            >
-              <FolderX className="inline-block align-bottom mr-1" size={20} />
+            </TabsTrigger>
+            <TabsTrigger value="notebooks" className="gap-1.5">
+              <FolderX size={16} />
               Deleted Notebooks
-            </button>
-          </div>
-        </div>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       )}
     </header>
   );

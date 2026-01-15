@@ -12,19 +12,15 @@ export const NotesProvider = ({ children }) => {
   const [notebooks, setNotebooks] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch all data when user is authenticated
   useEffect(() => {
     if (user) {
       fetchAllData();
     } else {
-      // Clear data when user logs out
       setNotes([]);
       setNotebooks([]);
     }
   }, [user]);
 
-  // Normalize relationship fields so the rest of the app can safely assume
-  // notebook = single ID string | null.
   const normalizeNotebook = (notebooksField) => {
     if (Array.isArray(notebooksField)) {
       const first = notebooksField[0];
@@ -55,11 +51,9 @@ export const NotesProvider = ({ children }) => {
     }
   };
 
-  // ==================== NOTES ====================
   const fetchNotes = async () => {
     try {
       const fetchedNotes = await dbService.getNotes(user.$id);
-      // Ensure relationships are flattened to IDs for predictable filtering
       const normalized = fetchedNotes.map(normalizeNote);
       setNotes(normalized);
     } catch (error) {
@@ -84,7 +78,6 @@ export const NotesProvider = ({ children }) => {
   const updateNote = async (noteId, noteData) => {
     try {
       await dbService.updateNote(noteId, noteData);
-      // Refetch all data to ensure relationships (notebooks) are properly loaded
       await fetchAllData();
       return;
     } catch (error) {
@@ -140,7 +133,6 @@ export const NotesProvider = ({ children }) => {
         return prev.map((note) => {
           if (note.$id === noteId) {
             const normalized = normalizeNote(updatedNote);
-            // Preserve the notebooks field if API doesn't return it
             if (!normalized.notebooks && note.notebooks) {
               normalized.notebooks = note.notebooks;
             }
@@ -156,7 +148,6 @@ export const NotesProvider = ({ children }) => {
     }
   };
 
-  // ==================== NOTEBOOKS ====================
   const fetchNotebooks = async () => {
     try {
       const fetchedNotebooks = await dbService.getNotebooks(user.$id);
@@ -212,20 +203,16 @@ export const NotesProvider = ({ children }) => {
 
   const trashNotebook = async (notebookId) => {
     try {
-      // Get all notes in this notebook and trash them
       const notesInNotebook = notes.filter(
         (note) => note.notebooks === notebookId && !note.isTrashed
       );
 
-      // Trash all notes in the notebook
       await Promise.all(
         notesInNotebook.map((note) => dbService.trashNote(note.$id))
       );
 
-      // Trash the notebook itself
       const updatedNotebook = await dbService.trashNotebook(notebookId);
 
-      // Update state - mark all notes in this notebook as trashed
       setNotes((prev) =>
         prev.map((note) =>
           note.notebooks === notebookId
@@ -234,7 +221,6 @@ export const NotesProvider = ({ children }) => {
         )
       );
 
-      // Update notebook state
       setNotebooks((prev) =>
         prev.map((notebook) =>
           notebook.$id === notebookId ? updatedNotebook : notebook
@@ -249,20 +235,16 @@ export const NotesProvider = ({ children }) => {
 
   const restoreNotebook = async (notebookId) => {
     try {
-      // Get all trashed notes in this notebook and restore them
       const trashedNotesInNotebook = notes.filter(
         (note) => note.notebooks === notebookId && note.isTrashed
       );
 
-      // Restore all trashed notes in the notebook
       await Promise.all(
         trashedNotesInNotebook.map((note) => dbService.restoreNote(note.$id))
       );
 
-      // Restore the notebook itself
       const updatedNotebook = await dbService.restoreNotebook(notebookId);
 
-      // Update state - mark all notes in this notebook as restored
       setNotes((prev) =>
         prev.map((note) =>
           note.notebooks === notebookId && note.isTrashed
@@ -271,7 +253,6 @@ export const NotesProvider = ({ children }) => {
         )
       );
 
-      // Update notebook state
       setNotebooks((prev) =>
         prev.map((notebook) =>
           notebook.$id === notebookId ? updatedNotebook : notebook
@@ -284,7 +265,6 @@ export const NotesProvider = ({ children }) => {
     }
   };
 
-  // ==================== COMPUTED VALUES ====================
   const getFavoriteNotes = () => {
     return notes.filter((note) => note.isFavorite && !note.isTrashed);
   };
@@ -316,19 +296,16 @@ export const NotesProvider = ({ children }) => {
       const trashedNotes = getTrashedNotes();
       const trashedNotebooks = getTrashedNotebooks();
 
-      // Delete all trashed notes
       await Promise.all(
         trashedNotes.map((note) => dbService.deleteNote(note.$id))
       );
 
-      // Delete all trashed notebooks
       await Promise.all(
         trashedNotebooks.map((notebook) =>
           dbService.deleteNotebook(notebook.$id)
         )
       );
 
-      // Update state to remove trashed items
       setNotes((prev) => prev.filter((note) => !note.isTrashed));
       setNotebooks((prev) => prev.filter((notebook) => !notebook.isTrashed));
     } catch (error) {
@@ -338,12 +315,10 @@ export const NotesProvider = ({ children }) => {
   };
 
   const contextData = {
-    // State
     notes,
     notebooks,
     loading,
 
-    // Notes methods
     fetchNotes,
     createNote,
     updateNote,
@@ -352,7 +327,6 @@ export const NotesProvider = ({ children }) => {
     restoreNote,
     toggleFavorite,
 
-    // Notebooks methods
     fetchNotebooks,
     createNotebook,
     updateNotebook,
@@ -360,7 +334,6 @@ export const NotesProvider = ({ children }) => {
     trashNotebook,
     restoreNotebook,
 
-    // Computed values
     getFavoriteNotes,
     getTrashedNotes,
     getTrashedNotebooks,
@@ -369,7 +342,6 @@ export const NotesProvider = ({ children }) => {
     getNotesByNotebook,
     emptyTrash,
 
-    // Refresh all data
     refreshData: fetchAllData,
   };
 

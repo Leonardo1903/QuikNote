@@ -7,7 +7,7 @@
 ---
 
 ## 1. High-Level Design
-The system follows a **Client-Side Rendered (CSR) SPA** architecture using React with Vite as the build tool. The frontend communicates with Appwrite backend services for authentication, database operations, and file storage. All user data is secured through Appwrite's authentication and database rules. The application supports offline-friendly UI with real-time sync when connection is available.
+The system follows a **Client-Side Rendered (CSR) SPA** architecture using React with Vite as the build tool. The frontend communicates with Appwrite backend services for authentication, database operations, and file storage. All user data is secured through Appwrite's authentication and database rules. The application supports offline-friendly UI with real-time sync when connection is available. Key features include dual view modes (grid/list), real-time search functionality, and comprehensive note organization through notebooks.
 
 ### System Diagram
 ```mermaid
@@ -18,12 +18,20 @@ graph TD;
     %% Frontend Routes
     subgraph Frontend_Pages
         Vite -->|Router| Landing[Landing/Home Page];
-        Vite -->|Router| AuthPages[Login/Signup Pages];
-        Vite -->|Router| Dashboard[Dashboard];
+        Vite -->|Router| AuthPages[Login/Signup Pages with shadcn UI];
+        Vite -->|Router| Dashboard[Dashboard with Grid/List Views];
         Vite -->|Router| Notebooks[Notebooks View];
         Vite -->|Router| Favorites[Favorites View];
-        Vite -->|Router| Trash[Trash View];
-        Vite -->|Router| Profile[Profile Page];
+        Vite -->|Router| Trash[Trash View with Tabs];
+        Vite -->|Router| Profile[Profile Page with Settings];
+    end
+    
+    %% Features
+    subgraph Frontend_Features
+        Dashboard -->|Search| Search[Real-time Search Filter];
+        Dashboard -->|Toggle| ViewMode[Grid/List View Toggle];
+        AuthPages -->|Uses| Cards[shadcn Card Components];
+        Profile -->|Uses| Forms[shadcn Form Components];
     end
     
     %% Appwrite Services
@@ -63,7 +71,7 @@ graph TD;
 | **Frontend Framework** | React 18 | Modern component-based UI, hooks for state management, large ecosystem. |
 | **Build Tool** | Vite | Fast development server, optimized builds, excellent HMR (Hot Module Replacement). |
 | **Language** | JavaScript | Fast development cycle; TypeScript optional for future enhancement. |
-| **UI Library** | shadcn/ui + Tailwind CSS | Pre-built accessible components, fully customizable, no runtime overhead. |
+| **UI Library** | shadcn/ui + Tailwind CSS | Pre-built accessible components (14+ components), fully customizable, no runtime overhead. Consistent design system across all pages including Login, Signup, Profile, and Dashboard components. |
 | **State Management** | React Context API | Sufficient for app size; no need for Redux; lightweight solution. |
 | **Routing** | React Router v6 | Client-side routing, dynamic route matching, nested routes support. |
 | **Authentication** | Appwrite Auth | Secure user authentication with email/password, sessions, and permissions. |
@@ -164,6 +172,13 @@ Context API is chosen for:
 5. Protected routes check auth context; redirect to login if not authenticated
 6. Session persists across page reloads
 
+### View and Search Features
+1. **Dual View Modes:** Users can toggle between Grid (masonry layout) and List views
+2. **Real-Time Search:** Search functionality filters notes by title, content, and tags
+3. **View Persistence:** Current view preference maintained within session
+4. **Cross-Page Search:** Search works consistently across Dashboard, Favorites, Notebooks, and Trash
+5. **Dynamic Count:** Note count in header updates based on search results
+
 ### Note Organization with Notebooks
 1. User creates multiple notebooks for different projects/categories
 2. Notes are associated with a `notebookId` in the database
@@ -190,18 +205,13 @@ Organization of React + Vite project:
   ├── /src
   │     ├── /components        # Reusable React components
   │     │     ├── /ui                   # shadcn/ui components
-  │     │     │     ├── button.jsx
-  │     │     │     ├── input.jsx
-  │     │     │     ├── label.jsx
-  │     │     │     ├── spinner.jsx
-  │     │     │     └── sonner.jsx
   │     │     ├── Navbar.jsx            # Top navigation bar
   │     │     ├── Sidebar.jsx           # Left sidebar navigation
-  │     │     ├── Header.jsx            # Page header
+  │     │     ├── Header.jsx            # Page header with search and view toggle
   │     │     ├── Footer.jsx            # Page footer
   │     │     ├── NoteModal.jsx         # Create/edit note modal
   │     │     ├── ConfirmDialog.jsx     # Confirmation dialog
-  │     │     ├── MainGrid.jsx          # Notes grid/list view
+  │     │     ├── MainGrid.jsx          # Notes grid/list view with dual layout support
   │     │     ├── ThemeToggle.jsx       # Dark/light theme toggle
   │     │     ├── Benefits.jsx          # Landing page benefits
   │     │     ├── Features.jsx          # Landing page features
@@ -232,9 +242,7 @@ Organization of React + Vite project:
   │     ├── App.css            # Global app styles
   │     ├── App.jsx            # Root App component with providers
   │     ├── index.css          # Global CSS and Tailwind imports
-  │     ├── main.jsx           # Entry point
-  │     └── /hooks             # Custom React hooks
-  │           └── (future custom hooks)
+  │     └── main.jsx           # Entry point
   ├── /docs                    # Documentation
   │     ├── PRD.md
   │     ├── ARCHITECTURE.md    # You are here

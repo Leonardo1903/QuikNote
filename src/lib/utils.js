@@ -31,20 +31,3 @@ export function formatTimeAgo(dateString) {
   return "Just now";
 }
 
-export function getCategoryColor(categoryName) {
-  const colors = {
-    work: "indigo",
-    personal: "emerald",
-    school: "orange",
-    design: "purple",
-    general: "slate",
-    strategy: "indigo",
-    meeting: "purple",
-    feedback: "orange",
-    research: "blue",
-    legal: "blue",
-    bug: "red",
-  };
-
-  return colors[categoryName?.toLowerCase()] || "slate";
-}
